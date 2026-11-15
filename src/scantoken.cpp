@@ -345,12 +345,13 @@ void Scanner::ScanQuotedScalar() {
   params.end = &end;
   params.eatEnd = true;
   params.escape = (single ? '\'' : '\\');
-  params.indent = 0;
+  params.indent = (InFlowContext() ? 0 : GetTopIndent() + 1);
   params.fold = FOLD_FLOW;
   params.eatLeadingWhitespace = true;
   params.trimTrailingSpaces = false;
   params.chomp = CLIP;
   params.onDocIndicator = THROW;
+  params.onTabInIndentation = THROW;
 
   // insert a potential simple key
   InsertPotentialSimpleKey();

@@ -195,8 +195,9 @@ std::string ScanScalar(Stream& INPUT, ScanScalarParams& params) {
     moreIndented = nextMoreIndented;
     pastOpeningBreak = true;
 
-    // are we done via indentation?
-    if (!emptyLine && INPUT.column() < params.indent) {
+    // are we done via indentation? (quoted scalars only end at their closing
+    // quote)
+    if (!params.eatEnd && !emptyLine && INPUT.column() < params.indent) {
       params.leadingSpaces = true;
       break;
     }
