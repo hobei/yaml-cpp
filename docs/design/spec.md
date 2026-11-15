@@ -35,6 +35,12 @@ small and focused, and should match upstream yaml-cpp style.
   `tag:yaml.org,2002:null` (e.g. `!!null`). An empty node with any other
   tag (e.g. `!`, `!!str`, `!foo`) loads as an empty-string Scalar that
   keeps its tag.
+- Tabs in indentation: in block context, a continuation line of a plain or
+  quoted (single or double) scalar whose required indentation
+  (`s-indent(n)`, with `n` = enclosing block indent + 1) contains a tab
+  raises `ParserException` (`TAB_IN_INDENTATION`). Tabs after the required
+  spaces are separation whitespace and stay valid. Root-level scalars
+  (`n` = 0) and scalars inside flow collections are not checked.
 - Emitted YAML must load back to an equal node tree (round trip).
 - No undefined behaviour or leaks: tests run under ASan and UBSan.
 

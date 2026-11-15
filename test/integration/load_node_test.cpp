@@ -536,6 +536,22 @@ TEST(LoadNodeTest, IncorrectSeqEnd) {
   EXPECT_THROW(Load("[foo]_bar"), ParserException);
 }
 
+TEST(LoadNodeTest, QuotedScalarTabIndentationThrows) {
+  EXPECT_THROW(Load("foo: \"bar\n\tbaz\""), ParserException);
+  EXPECT_THROW(Load("foo: 'bar\n\tbaz'"), ParserException);
+  EXPECT_THROW(Load("- \"bar\n\tbaz\""), ParserException);
+  EXPECT_THROW(Load("a:\n  foo: \"bar\n  \tbaz\""), ParserException);
+  EXPECT_THROW(Load("foo: \"bar\n\t\n baz\""), ParserException);
+}
+
+TEST(LoadNodeTest, QuotedScalarTabAfterIndentation) {
+  EXPECT_EQ("bar baz", Load("foo: \"bar\n \tbaz\"")["foo"].as<std::string>());
+  EXPECT_EQ("bar baz", Load("foo: 'bar\n \tbaz'")["foo"].as<std::string>());
+  EXPECT_EQ("bar baz", Load("\"bar\n\tbaz\"").as<std::string>());
+  EXPECT_EQ("bar baz", Load("[\"bar\n\tbaz\"]")[0].as<std::string>());
+  EXPECT_EQ("bar baz", Load("foo: \"bar\nbaz\"")["foo"].as<std::string>());
+}
+
 TEST(LoadNodeTest, NonUniqueMapKey) {
   EXPECT_THROW(Load("{a: A, b: B, a: A}"), NonUniqueMapKey);
 }
