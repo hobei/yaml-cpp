@@ -14,6 +14,13 @@
 #include "yaml-cpp/null.h"
 
 namespace YAML {
+namespace {
+// Resolved tag of the YAML null type: "!!null" expands to this under the
+// default "!!" handle. See YAML 1.2.2 §10.2.1.1 (Null) and §10.3.2 (Tag
+// Resolution: empty content resolves to tag:yaml.org,2002:null).
+const char* const kNullTag = "tag:yaml.org,2002:null";
+}  // namespace
+
 SingleDocParser::SingleDocParser(Scanner& scanner, const Directives& directives)
     : m_scanner(scanner),
       m_directives(directives),
@@ -146,7 +153,7 @@ void SingleDocParser::HandleNode(EventHandler& eventHandler) {
       break;
   }
 
-  if (tag == "?")
+  if (tag == "?" || tag == kNullTag)
     eventHandler.OnNull(mark, anchor);
   else
     eventHandler.OnScalar(mark, tag, anchor, "");
