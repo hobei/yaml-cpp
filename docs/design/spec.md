@@ -30,6 +30,11 @@ small and focused, and should match upstream yaml-cpp style.
   not be silently accepted.
 - Input the spec accepts must load with the same structure, tags and values the
   spec describes.
+- Null resolution: a node with empty content loads as Null (`OnNull`) when
+  it is untagged, has the non-specific `?` tag, or has the explicit tag
+  `tag:yaml.org,2002:null` (e.g. `!!null`). An empty node with any other
+  tag (e.g. `!`, `!!str`, `!foo`) loads as an empty-string Scalar that
+  keeps its tag.
 - Emitted YAML must load back to an equal node tree (round trip).
 - No undefined behaviour or leaks: tests run under ASan and UBSan.
 
