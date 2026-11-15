@@ -1,0 +1,46 @@
+# Copy to <project>/.github/workflows/agent.yml. Keep the file name (or set
+# "workflowFile" in .github/agent/config.json): the agents hand off between
+# stages by dispatching this workflow.
+name: Agent
+run-name: >-
+  Agent · ${{ github.event_name == 'workflow_dispatch' && format('{0} #{1}', inputs.stage, inputs.number)
+  || format('{0} on #{1}', github.event_name, github.event.issue.number || github.event.pull_request.number) }}
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Stage to run
+        type: choice
+        options: [design, develop, review, judge]
+        required: true
+      number:
+        description: Issue number (design) or agent PR number
+        type: string
+        required: true
+
+permissions: {}
+
+jobs:
+  agent:
+    if: github.event_name == 'workflow_dispatch' || github.event.sender.type != 'Bot'
+    uses: hobei/agent-factory/.github/workflows/agent.yml@v1
+    permissions:
+      actions: write
+      contents: write
+      issues: write
+      pull-requests: write
+      statuses: write
+    with:
+      agent-users: ${{ vars.AGENT_USERS }}
+      model: ${{ vars.AGENT_MODEL }}
+      build-runner: ${{ vars.AGENT_BUILD_RUNNER }}
+    secrets: inherit
