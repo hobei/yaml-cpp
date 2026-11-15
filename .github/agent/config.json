@@ -1,0 +1,16 @@
+{
+  "design": {
+    "dir": "docs/design",
+    "specFile": "docs/design/spec.md"
+  },
+  "judge": {
+    "protectedPaths": [
+      ".github/**", "CLAUDE.md", "scripts/**",
+      "CMakeLists.txt", "**/CMakeLists.txt", "cmake/**",
+      "BUILD.bazel", "**/BUILD.bazel", "MODULE.bazel", "MODULE.bazel.lock",
+      "test/googletest-*/**"
+    ],
+    "sourcePaths": ["src/**", "include/**"],
+    "testPaths": ["test/**"]
+  }
+}
