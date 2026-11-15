@@ -540,5 +540,32 @@ TEST(LoadNodeTest, NonUniqueMapKey) {
   EXPECT_THROW(Load("{a: A, b: B, a: A}"), NonUniqueMapKey);
 }
 
+TEST(LoadNodeTest, ExplicitNullTagEmptyIsNull) {
+  Node doc = Load("---\ntest: !!null \nfoo: bar");
+  EXPECT_TRUE(doc["test"].IsNull());
+  EXPECT_EQ(NodeType::Null, doc["test"].Type());
+  EXPECT_EQ("bar", doc["foo"].as<std::string>());
+
+  Node verbatim = Load("test: !<tag:yaml.org,2002:null> \nfoo: bar");
+  EXPECT_TRUE(verbatim["test"].IsNull());
+
+  Node flow = Load("[!!null , a]");
+  ASSERT_TRUE(flow.IsSequence());
+  ASSERT_EQ(2u, flow.size());
+  EXPECT_TRUE(flow[0].IsNull());
+  EXPECT_EQ("a", flow[1].as<std::string>());
+
+  Node anchored = Load("a: &x !!null \nb: *x");
+  EXPECT_TRUE(anchored["a"].IsNull());
+  EXPECT_TRUE(anchored["b"].IsNull());
+}
+
+TEST(LoadNodeTest, ExplicitStrTagEmptyIsEmptyScalar) {
+  Node doc = Load("a: !!str ");
+  EXPECT_TRUE(doc["a"].IsScalar());
+  EXPECT_EQ("", doc["a"].Scalar());
+  EXPECT_EQ("tag:yaml.org,2002:str", doc["a"].Tag());
+}
+
 }  // namespace
 }  // namespace YAML

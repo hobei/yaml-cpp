@@ -43,6 +43,28 @@ TEST_F(HandlerTest, NullStringScalar) {
   Parse("foo: null");
 }
 
+TEST_F(HandlerTest, ExplicitNullTagEmptyContent) {
+  EXPECT_CALL(handler, OnDocumentStart(_));
+  EXPECT_CALL(handler, OnMapStart(_, "?", 0, EmitterStyle::Block));
+  EXPECT_CALL(handler, OnScalar(_, "?", 0, "test"));
+  EXPECT_CALL(handler, OnNull(_, 0));
+  EXPECT_CALL(handler, OnScalar(_, "?", 0, "foo"));
+  EXPECT_CALL(handler, OnScalar(_, "?", 0, "bar"));
+  EXPECT_CALL(handler, OnMapEnd());
+  EXPECT_CALL(handler, OnDocumentEnd());
+  Parse("test: !!null \nfoo: bar");
+}
+
+TEST_F(HandlerTest, ExplicitNullTagNonEmptyContent) {
+  EXPECT_CALL(handler, OnDocumentStart(_));
+  EXPECT_CALL(handler, OnMapStart(_, "?", 0, EmitterStyle::Block));
+  EXPECT_CALL(handler, OnScalar(_, "?", 0, "test"));
+  EXPECT_CALL(handler, OnScalar(_, "tag:yaml.org,2002:null", 0, "~"));
+  EXPECT_CALL(handler, OnMapEnd());
+  EXPECT_CALL(handler, OnDocumentEnd());
+  Parse("test: !!null ~");
+}
+
 TEST_F(HandlerTest, CommentOnNewlineOfMapValueWithNoSpaces) {
   EXPECT_CALL(handler, OnDocumentStart(_));
   EXPECT_CALL(handler, OnMapStart(_, "?", 0, EmitterStyle::Block));
